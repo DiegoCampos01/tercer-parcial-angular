@@ -1,0 +1,76 @@
+<div class="dashboard-container">
+  <nav class="dashboard-nav">
+    <div class="nav-left">
+      <h1>Panel de Control - Universidad XYZ</h1>
+    </div>
+    <div class="nav-right">
+      <span class="user-info" *ngIf="currentUser">
+        <i class="fas fa-user"></i>
+        {{ currentUser.email }}
+      </span>
+      <button class="btn-logout" (click)="logout()">Cerrar Sesión</button>
+    </div>
+  </nav>
+  
+  <div class="dashboard-content">
+    <h2>Bienvenido al Sistema Universitario</h2>
+    
+    <!-- Sección de Materias -->
+    <section class="content-section">
+      <h3>Materias Inscritas</h3>
+      <div class="table-container">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Materia</th>
+              <th>Profesor</th>
+              <th>Horario</th>
+              <th>Aula</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let materia of materias">
+              <td>{{ materia.nombre }}</td>
+              <td>{{ materia.profesor }}</td>
+              <td>{{ materia.horario }}</td>
+              <td>{{ materia.aula }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Sección de Evaluaciones -->
+    <section class="content-section">
+      <h3>Próximas Evaluaciones</h3>
+      <div class="evaluaciones-grid">
+        <div class="evaluacion-card" *ngFor="let evaluacion of evaluaciones">
+          <div class="evaluacion-header">
+            <span class="fecha">{{ evaluacion.fecha }}</span>
+            <span class="tipo-badge">{{ evaluacion.tipo }}</span>
+          </div>
+          <h4>{{ evaluacion.materia }}</h4>
+        </div>
+      </div>
+    </section>
+
+    <!-- Enlaces Rápidos -->
+    <section class="content-section">
+      <h3>Enlaces Rápidos</h3>
+      <div class="quick-links">
+        <button class="quick-link-btn">
+          <i class="fas fa-calendar"></i>
+          Calendario Académico
+        </button>
+        <button class="quick-link-btn">
+          <i class="fas fa-book"></i>
+          Biblioteca Virtual
+        </button>
+        <button class="quick-link-btn">
+          <i class="fas fa-graduation-cap"></i>
+          Portal Estudiantil
+        </button>
+      </div>
+    </section>
+  </div>
+</div> 
