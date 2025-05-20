@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { User } from '../../models/user.interface';
+import { NavMenuComponent } from '../../components/layout/nav-menu/nav-menu.component';
 
 interface Materia {
   id: number;
@@ -23,7 +24,7 @@ interface Evaluacion {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, NavMenuComponent]
 })
 export class DashboardComponent implements OnInit {
   currentUser: User | null = null;

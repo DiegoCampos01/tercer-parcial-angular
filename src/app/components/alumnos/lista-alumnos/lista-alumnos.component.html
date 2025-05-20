@@ -1,46 +1,68 @@
-<div class="container mt-4">
+<div class="container">
   <h2 appTituloGrande>Lista de Alumnos</h2>
-  <button mat-raised-button color="primary" routerLink="/alumnos/nuevo" class="mb-3">
-    Nuevo Alumno
+  
+  <button mat-raised-button color="primary" class="add-button" routerLink="/alumnos/nuevo">
+    <mat-icon>add</mat-icon>
+    Agregar Alumno
   </button>
+
   <table mat-table [dataSource]="alumnos" class="mat-elevation-z8">
+    <!-- ID Column -->
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef>ID</th>
-      <td mat-cell *matCellDef="let alumno">{{ alumno.id }}</td>
+      <td mat-cell *matCellDef="let alumno">{{alumno.id}}</td>
     </ng-container>
 
-    <ng-container matColumnDef="nombreCompleto">
+    <!-- Nombre Column -->
+    <ng-container matColumnDef="nombre">
       <th mat-header-cell *matHeaderCellDef>Nombre Completo</th>
-      <td mat-cell *matCellDef="let alumno">{{ alumno | nombreCompleto }}</td>
+      <td mat-cell *matCellDef="let alumno">{{alumno | nombreCompleto}}</td>
     </ng-container>
 
+    <!-- Email Column -->
     <ng-container matColumnDef="email">
       <th mat-header-cell *matHeaderCellDef>Email</th>
-      <td mat-cell *matCellDef="let alumno">{{ alumno.email }}</td>
+      <td mat-cell *matCellDef="let alumno">{{alumno.email}}</td>
     </ng-container>
 
-    <ng-container matColumnDef="edad">
-      <th mat-header-cell *matHeaderCellDef>Edad</th>
-      <td mat-cell *matCellDef="let alumno">{{ alumno.edad }}</td>
+    <!-- Fecha Nacimiento Column -->
+    <ng-container matColumnDef="fechaNacimiento">
+      <th mat-header-cell *matHeaderCellDef>Fecha de Nacimiento</th>
+      <td mat-cell *matCellDef="let alumno">{{alumno.fechaNacimiento | date}}</td>
     </ng-container>
 
-    <ng-container matColumnDef="calificacion">
-      <th mat-header-cell *matHeaderCellDef>Calificación</th>
+    <!-- Cursos Inscritos Column -->
+    <ng-container matColumnDef="cursosInscritos">
+      <th mat-header-cell *matHeaderCellDef>Cursos Inscritos y Notas</th>
       <td mat-cell *matCellDef="let alumno">
-        <div [ngClass]="getCalificacionColor(alumno.calificacion)">
-          {{alumno.calificacion}} - {{getCalificacionEstado(alumno.calificacion)}}
+        <div *ngFor="let curso of getCursosAlumno(alumno.id); let last = last" class="curso-nota">
+          {{curso.nombre}}
+          <ng-container *ngIf="getNotaCurso(alumno.id, curso.id) as nota">
+            - <span [class]="'nota-' + getCalificacionColor(nota)">{{nota.toFixed(1)}}</span>
+            <span [class]="'estado-' + getCalificacionColor(nota)" class="estado-badge">
+              {{getCalificacionEstado(nota)}}
+            </span>
+          </ng-container>
+          <ng-container *ngIf="!getNotaCurso(alumno.id, curso.id)">
+            - <span class="nota-pendiente">Sin calificar</span>
+          </ng-container>
+          {{!last ? '; ' : ''}}
         </div>
       </td>
     </ng-container>
 
+    <!-- Acciones Column -->
     <ng-container matColumnDef="acciones">
       <th mat-header-cell *matHeaderCellDef>Acciones</th>
       <td mat-cell *matCellDef="let alumno">
-        <button mat-button color="primary" [routerLink]="['/alumnos/editar', alumno.id]">
-          Editar
+        <button mat-icon-button color="primary" [routerLink]="['/alumnos/editar', alumno.id]" matTooltip="Editar">
+          <mat-icon>edit</mat-icon>
         </button>
-        <button mat-button color="warn" (click)="eliminarAlumno(alumno)">
-          Eliminar
+        <button mat-icon-button color="accent" [routerLink]="['/inscripciones/alumno', alumno.id]" matTooltip="Inscribir a cursos">
+          <mat-icon>school</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="eliminarAlumno(alumno)" matTooltip="Eliminar">
+          <mat-icon>delete</mat-icon>
         </button>
       </td>
     </ng-container>

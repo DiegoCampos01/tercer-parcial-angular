@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { Alumno } from '../../../models/alumno.model';
-import { TituloGrandeDirective } from '../../../directives/titulo-grande.directive';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AlumnosService } from '../../../services/alumnos.service';
+import { Alumno } from '../../../models/alumno.model';
 
 @Component({
   selector: 'app-abm-alumnos',
@@ -18,55 +19,63 @@ import { AlumnosService } from '../../../services/alumnos.service';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    RouterLink,
-    TituloGrandeDirective
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './abm-alumnos.component.html',
   styleUrls: ['./abm-alumnos.component.scss']
 })
 export class AbmAlumnosComponent implements OnInit {
   alumnoForm: FormGroup;
-  isEdit = false;
+  esEdicion = false;
   alumnoId: number | null = null;
 
   constructor(
     private fb: FormBuilder,
+    private alumnosService: AlumnosService,
     private router: Router,
-    private route: ActivatedRoute,
-    private alumnosService: AlumnosService
+    private route: ActivatedRoute
   ) {
     this.alumnoForm = this.fb.group({
-      nombre: ['', Validators.required],
-      apellido: ['', Validators.required],
+      nombre: ['', [Validators.required, Validators.minLength(2)]],
+      apellido: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      edad: ['', [Validators.required, Validators.min(18)]],
-      calificacion: ['', [Validators.required, Validators.min(0), Validators.max(5)]]
+      fechaNacimiento: ['', Validators.required]
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.isEdit = true;
-      this.alumnoId = Number(id);
-      const alumno = this.alumnosService.getAlumnoPorId(this.alumnoId);
+      this.esEdicion = true;
+      this.alumnoId = +id;
+      const alumno = this.alumnosService.getAlumnoById(this.alumnoId);
       if (alumno) {
         this.alumnoForm.patchValue(alumno);
       }
     }
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.alumnoForm.valid) {
-      if (this.isEdit && this.alumnoId) {
-        this.alumnosService.editarAlumno({
+      const alumnoData = this.alumnoForm.value;
+      
+      if (this.esEdicion && this.alumnoId) {
+        const alumnoActualizado: Alumno = {
+          ...alumnoData,
           id: this.alumnoId,
-          ...this.alumnoForm.value
-        });
+          cursos: this.alumnosService.getAlumnoById(this.alumnoId)?.cursos || []
+        };
+        this.alumnosService.actualizarAlumno(alumnoActualizado);
       } else {
-        this.alumnosService.agregarAlumno(this.alumnoForm.value);
+        this.alumnosService.agregarAlumno(alumnoData);
       }
+      
       this.router.navigate(['/alumnos']);
     }
+  }
+
+  cancelar(): void {
+    this.router.navigate(['/alumnos']);
   }
 } 

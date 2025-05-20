@@ -1,17 +1,6 @@
+<app-nav-menu></app-nav-menu>
+
 <div class="dashboard-container">
-  <nav class="dashboard-nav">
-    <div class="nav-left">
-      <h1>Panel de Control - Universidad XYZ</h1>
-    </div>
-    <div class="nav-right">
-      <span class="user-info" *ngIf="currentUser">
-        <i class="fas fa-user"></i>
-        {{ currentUser.email }}
-      </span>
-      <button class="btn-logout" (click)="logout()">Cerrar Sesión</button>
-    </div>
-  </nav>
-  
   <div class="dashboard-content">
     <h2>Bienvenido al Sistema Universitario</h2>
     

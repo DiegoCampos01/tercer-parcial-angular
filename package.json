@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:clase-live-04-angular": "node dist/clase-live-04-angular/server/server.mjs",
-    "deploy": "ng deploy --base-href=/Primer-parcial-angular-cli/"
+    "deploy": "ng build --configuration production --base-href=\"/Primer-parcial-angular-cli/\" && npx angular-cli-ghpages --dir=dist/clase-live-04-angular/browser --no-silent"
   },
   "private": true,
   "dependencies": {

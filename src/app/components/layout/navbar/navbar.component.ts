@@ -14,6 +14,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 export class NavbarComponent {
   menuItems = [
     { path: '/alumnos', label: 'Lista de Alumnos' },
-    { path: '/alumnos/nuevo', label: 'Nuevo Alumno' }
+    { path: '/cursos', label: 'Cursos' },
+    { path: '/inscripciones', label: 'Inscripciones' },
+    { path: '/notas', label: 'Gestión de Notas' }
   ];
 } 

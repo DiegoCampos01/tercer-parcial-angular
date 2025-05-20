@@ -6,36 +6,106 @@ import { Alumno } from '../models/alumno.model';
   providedIn: 'root'
 })
 export class AlumnosService {
-  private alumnos: Alumno[] = [
-    { id: 1, nombre: 'Juan', apellido: 'Pérez', email: 'juan@email.com', edad: 20, calificacion: 4.5 },
-    { id: 2, nombre: 'María', apellido: 'Gómez', email: 'maria@email.com', edad: 22, calificacion: 2.8 },
-    { id: 3, nombre: 'Carlos', apellido: 'López', email: 'carlos@email.com', edad: 21, calificacion: 3.2 }
-  ];
+  private readonly STORAGE_KEY = 'alumnos';
+  private alumnos: Alumno[] = [];
+  private alumnosSubject = new BehaviorSubject<Alumno[]>([]);
 
-  private alumnosSubject = new BehaviorSubject<Alumno[]>(this.alumnos);
+  constructor() {
+    this.cargarAlumnos();
+  }
+
+  private cargarAlumnos(): void {
+    const alumnosGuardados = localStorage.getItem(this.STORAGE_KEY);
+    if (alumnosGuardados) {
+      this.alumnos = JSON.parse(alumnosGuardados).map((alumno: any) => ({
+        ...alumno,
+        fechaNacimiento: new Date(alumno.fechaNacimiento)
+      }));
+    } else {
+      // Datos de ejemplo
+      this.alumnos = [
+        {
+          id: 1,
+          nombre: 'Juan',
+          apellido: 'Pérez',
+          email: 'juan@email.com',
+          fechaNacimiento: new Date('1995-05-14'),
+          cursos: []
+        },
+        {
+          id: 2,
+          nombre: 'María',
+          apellido: 'González',
+          email: 'maria@email.com',
+          fechaNacimiento: new Date('2001-05-13'),
+          cursos: []
+        },
+        {
+          id: 3,
+          nombre: 'Spike',
+          apellido: 'Spiegel',
+          email: 'spike@email.com',
+          fechaNacimiento: new Date('1964-05-05'),
+          cursos: []
+        }
+      ];
+    }
+    this.alumnosSubject.next(this.alumnos);
+  }
+
+  private guardarAlumnos(): void {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.alumnos));
+    this.alumnosSubject.next(this.alumnos);
+  }
 
   getAlumnos(): Observable<Alumno[]> {
     return this.alumnosSubject.asObservable();
   }
 
-  agregarAlumno(alumno: Omit<Alumno, 'id'>): void {
-    const nuevoId = this.alumnos.length > 0 ? Math.max(...this.alumnos.map(a => a.id)) + 1 : 1;
-    const nuevoAlumno = { ...alumno, id: nuevoId };
-    this.alumnos = [...this.alumnos, nuevoAlumno];
-    this.alumnosSubject.next(this.alumnos);
+  getAlumnoById(id: number): Alumno | undefined {
+    return this.alumnos.find(a => a.id === id);
   }
 
-  editarAlumno(alumno: Alumno): void {
-    this.alumnos = this.alumnos.map(a => a.id === alumno.id ? alumno : a);
-    this.alumnosSubject.next(this.alumnos);
+  agregarAlumno(alumno: Omit<Alumno, 'id' | 'cursos'>): void {
+    const nuevoAlumno: Alumno = {
+      ...alumno,
+      id: this.generarNuevoId(),
+      cursos: []
+    };
+    this.alumnos.push(nuevoAlumno);
+    this.guardarAlumnos();
+  }
+
+  private generarNuevoId(): number {
+    return Math.max(...this.alumnos.map(a => a.id), 0) + 1;
+  }
+
+  actualizarAlumno(alumno: Alumno): void {
+    const index = this.alumnos.findIndex(a => a.id === alumno.id);
+    if (index !== -1) {
+      this.alumnos[index] = alumno;
+      this.guardarAlumnos();
+    }
   }
 
   eliminarAlumno(id: number): void {
     this.alumnos = this.alumnos.filter(a => a.id !== id);
-    this.alumnosSubject.next(this.alumnos);
+    this.guardarAlumnos();
   }
 
-  getAlumnoPorId(id: number): Alumno | undefined {
-    return this.alumnos.find(a => a.id === Number(id));
+  inscribirEnCurso(alumnoId: number, cursoId: number): void {
+    const alumno = this.getAlumnoById(alumnoId);
+    if (alumno && !alumno.cursos.includes(cursoId)) {
+      alumno.cursos.push(cursoId);
+      this.guardarAlumnos();
+    }
+  }
+
+  desinscribirDeCurso(alumnoId: number, cursoId: number): void {
+    const alumno = this.getAlumnoById(alumnoId);
+    if (alumno) {
+      alumno.cursos = alumno.cursos.filter(id => id !== cursoId);
+      this.guardarAlumnos();
+    }
   }
 } 

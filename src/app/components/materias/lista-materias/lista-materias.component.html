@@ -1,0 +1,97 @@
+<div class="container">
+  <h2>Lista de Cursos</h2>
+  
+  <table mat-table [dataSource]="cursos" class="mat-elevation-z8">
+    <!-- Nombre Column -->
+    <ng-container matColumnDef="nombre">
+      <th mat-header-cell *matHeaderCellDef>Nombre</th>
+      <td mat-cell *matCellDef="let curso">{{curso.nombre}}</td>
+    </ng-container>
+
+    <!-- Profesor Column -->
+    <ng-container matColumnDef="profesor">
+      <th mat-header-cell *matHeaderCellDef>Profesor</th>
+      <td mat-cell *matCellDef="let curso">{{curso.profesor}}</td>
+    </ng-container>
+
+    <!-- Horario Column -->
+    <ng-container matColumnDef="horario">
+      <th mat-header-cell *matHeaderCellDef>Horario</th>
+      <td mat-cell *matCellDef="let curso">{{curso.horario}}</td>
+    </ng-container>
+
+    <!-- Aula Column -->
+    <ng-container matColumnDef="aula">
+      <th mat-header-cell *matHeaderCellDef>Aula</th>
+      <td mat-cell *matCellDef="let curso">{{curso.aula}}</td>
+    </ng-container>
+
+    <!-- Acciones Column -->
+    <ng-container matColumnDef="acciones">
+      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let curso">
+        <button mat-raised-button color="primary" (click)="verAlumnos(curso.id)">
+          Ver Alumnos
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <!-- Lista de Alumnos -->
+  <div *ngIf="mostrarAlumnos" class="alumnos-section">
+    <h3>Alumnos del curso: {{cursos[cursoSeleccionado! - 1].nombre}}</h3>
+    
+    <table mat-table [dataSource]="alumnosActuales" class="mat-elevation-z8">
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let alumno">{{alumno.id}}</td>
+      </ng-container>
+
+      <!-- Nombre Completo Column -->
+      <ng-container matColumnDef="nombreCompleto">
+        <th mat-header-cell *matHeaderCellDef>Nombre Completo</th>
+        <td mat-cell *matCellDef="let alumno">{{alumno.nombreCompleto}}</td>
+      </ng-container>
+
+      <!-- Email Column -->
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let alumno">{{alumno.email}}</td>
+      </ng-container>
+
+      <!-- Edad Column -->
+      <ng-container matColumnDef="edad">
+        <th mat-header-cell *matHeaderCellDef>Edad</th>
+        <td mat-cell *matCellDef="let alumno">{{alumno.edad}}</td>
+      </ng-container>
+
+      <!-- Calificación Column -->
+      <ng-container matColumnDef="calificacion">
+        <th mat-header-cell *matHeaderCellDef>Calificación</th>
+        <td mat-cell *matCellDef="let alumno" [ngStyle]="{'color': alumno.calificacion.includes('APROBADO') ? 'green' : 'red'}">
+          {{alumno.calificacion}}
+        </td>
+      </ng-container>
+
+      <!-- Acciones Column -->
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let alumno">
+          <button mat-icon-button color="primary" (click)="editarAlumno(alumno)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="eliminarAlumno(alumno)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="alumnosDisplayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: alumnosDisplayedColumns;"></tr>
+    </table>
+  </div>
+</div>

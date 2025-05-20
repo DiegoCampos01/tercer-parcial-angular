@@ -1,0 +1,75 @@
+<div class="container">
+  <h2>{{ alumno ? 'Inscripciones a Cursos' : 'Lista de Inscripciones' }}</h2>
+  
+  <div *ngIf="alumno" class="alumno-info">
+    <p>Alumno: {{alumno.nombre}} {{alumno.apellido}}</p>
+  </div>
+
+  <table mat-table [dataSource]="cursosDisponibles" class="mat-elevation-z8">
+    <!-- Nombre Column -->
+    <ng-container matColumnDef="nombre">
+      <th mat-header-cell *matHeaderCellDef>Nombre del Curso</th>
+      <td mat-cell *matCellDef="let curso">{{curso.nombre}}</td>
+    </ng-container>
+
+    <!-- Profesor Column -->
+    <ng-container matColumnDef="profesor">
+      <th mat-header-cell *matHeaderCellDef>Profesor</th>
+      <td mat-cell *matCellDef="let curso">{{curso.profesor}}</td>
+    </ng-container>
+
+    <!-- Duración Column -->
+    <ng-container matColumnDef="duracion">
+      <th mat-header-cell *matHeaderCellDef>Duración (horas)</th>
+      <td mat-cell *matCellDef="let curso">{{curso.duracion}}</td>
+    </ng-container>
+
+    <!-- Cupos Disponibles Column -->
+    <ng-container matColumnDef="cuposDisponibles">
+      <th mat-header-cell *matHeaderCellDef>Cupos Disponibles</th>
+      <td mat-cell *matCellDef="let curso">{{curso.cuposDisponibles}}</td>
+    </ng-container>
+
+    <!-- Acciones Column -->
+    <ng-container matColumnDef="acciones">
+      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let curso">
+        <ng-container *ngIf="alumno; else verDetalles">
+          <button *ngIf="!curso.inscrito"
+                  mat-raised-button 
+                  color="primary" 
+                  (click)="inscribirse(curso)" 
+                  [disabled]="curso.cuposDisponibles === 0">
+            <mat-icon>school</mat-icon>
+            Inscribirse
+          </button>
+          <button *ngIf="curso.inscrito"
+                  mat-raised-button 
+                  color="warn" 
+                  (click)="desinscribirse(curso)">
+            <mat-icon>cancel</mat-icon>
+            Desinscribirse
+          </button>
+        </ng-container>
+        <ng-template #verDetalles>
+          <button mat-raised-button 
+                  color="primary" 
+                  [routerLink]="['/inscripciones/alumno', curso.id]">
+            <mat-icon>visibility</mat-icon>
+            Ver Detalles
+          </button>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <div class="actions-container" *ngIf="alumno">
+    <button mat-button color="primary" (click)="volver()">
+      <mat-icon>arrow_back</mat-icon>
+      Volver a la lista de alumnos
+    </button>
+  </div>
+</div>

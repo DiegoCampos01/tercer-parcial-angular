@@ -11,4 +11,36 @@ mat-form-field {
 .actions {
   margin-top: 20px;
   text-align: right;
+}
+
+.container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+mat-form-field {
+  margin-bottom: 8px;
 } 

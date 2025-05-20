@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { AuthService } from '../../services/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -16,51 +16,35 @@ import { AuthService } from '../../services/auth.service';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
-    MatCardModule
+    MatButtonModule
   ],
   template: `
     <div class="login-container">
-      <mat-card class="login-card">
-        <mat-card-header>
-          <mat-card-title>Universidad Patito</mat-card-title>
-          <mat-card-subtitle>Iniciar Sesión</mat-card-subtitle>
-        </mat-card-header>
+      <div class="login-card">
+        <h2>Iniciar Sesión</h2>
+        
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Usuario</mat-label>
+            <input matInput formControlName="username" required>
+            <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+              El usuario es requerido
+            </mat-error>
+          </mat-form-field>
 
-        <mat-card-content>
-          <div class="credentials-info">
-            <strong>Credenciales de prueba:</strong><br>
-            Email: profesor&#64;universidad.com<br>
-            Contraseña: 123456
-          </div>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contraseña</mat-label>
+            <input matInput formControlName="password" type="password" required>
+            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+              La contraseña es requerida
+            </mat-error>
+          </mat-form-field>
 
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-            <mat-form-field appearance="fill" class="full-width">
-              <mat-label>Correo Electrónico</mat-label>
-              <input matInput formControlName="email" type="email">
-              <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
-                El correo es requerido
-              </mat-error>
-              <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
-                Ingrese un correo válido
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="fill" class="full-width">
-              <mat-label>Contraseña</mat-label>
-              <input matInput formControlName="password" type="password">
-              <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-                La contraseña es requerida
-              </mat-error>
-            </mat-form-field>
-
-            <button mat-raised-button color="primary" type="submit" class="full-width"
-                    [disabled]="loginForm.invalid">
-              Iniciar Sesión
-            </button>
-          </form>
-        </mat-card-content>
-      </mat-card>
+          <button mat-raised-button color="primary" type="submit" class="full-width" [disabled]="loginForm.invalid">
+            Ingresar
+          </button>
+        </form>
+      </div>
     </div>
   `,
   styles: [`
@@ -69,57 +53,60 @@ import { AuthService } from '../../services/auth.service';
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #673ab7;
+      background-color: #f5f5f5;
     }
     .login-card {
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 400px;
-      margin: 20px;
-      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #333;
     }
     .full-width {
       width: 100%;
-      margin-bottom: 16px;
+      margin-bottom: 1rem;
     }
-    .credentials-info {
-      background-color: #e3f2fd;
-      padding: 15px;
-      border-radius: 4px;
-      margin-bottom: 20px;
-      font-size: 14px;
-    }
-    mat-card-header {
-      margin-bottom: 20px;
-    }
-    mat-card-title {
-      font-size: 24px;
-      margin-bottom: 8px !important;
+    button {
+      margin-top: 1rem;
     }
   `]
 })
 export class LoginComponent {
   loginForm: FormGroup;
+  returnUrl: string;
 
   constructor(
     private fb: FormBuilder,
+    private authService: AuthService,
     private router: Router,
-    private authService: AuthService
+    private route: ActivatedRoute,
+    private snackBar: MatSnackBar
   ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      username: ['', Validators.required],
       password: ['', Validators.required]
     });
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
+      const { username, password } = this.loginForm.value;
       
-      if (this.authService.login(email, password)) {
-        this.router.navigate(['/alumnos']);
-      } else {
-        alert('Credenciales incorrectas');
-      }
+      this.authService.login(username, password).subscribe({
+        next: () => {
+          this.router.navigateByUrl(this.returnUrl);
+        },
+        error: (error) => {
+          this.snackBar.open('Usuario o contraseña incorrectos', 'Cerrar', { duration: 3000 });
+        }
+      });
     }
   }
 } 

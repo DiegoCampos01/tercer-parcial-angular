@@ -1,0 +1,50 @@
+.container {
+  padding: 20px;
+}
+
+h2, h3 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.mat-elevation-z8 {
+  width: 100%;
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-mdc-row:hover {
+  background-color: #f5f5f5;
+}
+
+th.mat-header-cell {
+  background-color: #f8f9fa;
+  color: #333;
+  font-weight: 600;
+}
+
+.mat-column-acciones {
+  width: 120px;
+  text-align: center;
+}
+
+.alumnos-section {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 2px solid #eee;
+}
+
+.mat-column-calificacion {
+  font-weight: 500;
+}
+
+button[mat-raised-button] {
+  min-width: 120px;
+}
+
+button[mat-icon-button] {
+  margin: 0 4px;
+}

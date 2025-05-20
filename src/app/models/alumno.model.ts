@@ -3,6 +3,6 @@ export interface Alumno {
   nombre: string;
   apellido: string;
   email: string;
-  edad: number;
-  calificacion: number;
+  fechaNacimiento: Date;
+  cursos: number[]; // IDs de los cursos en los que está inscrito
 } 

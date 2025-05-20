@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { User } from '../models/user.interface';
 import { Router } from '@angular/router';
 
@@ -10,7 +9,6 @@ import { Router } from '@angular/router';
 export class AuthService {
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
-  private isLoggedIn = false;
 
   // Usuario de prueba
   private mockUser: User = {
@@ -19,11 +17,8 @@ export class AuthService {
     role: 'profesor'
   };
 
-  constructor(
-    private router: Router
-  ) {
+  constructor(private router: Router) {
     const storedUser = localStorage.getItem('currentUser');
-    this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     this.currentUserSubject = new BehaviorSubject<User | null>(
       storedUser ? JSON.parse(storedUser) : null
     );
@@ -43,8 +38,6 @@ export class AuthService {
         role: 'profesor'
       };
       
-      this.isLoggedIn = true;
-      localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('currentUser', JSON.stringify(user));
       this.currentUserSubject.next(user);
       return true;
@@ -53,14 +46,12 @@ export class AuthService {
   }
 
   logout(): void {
-    this.isLoggedIn = false;
-    localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }
 
   isAuthenticated(): boolean {
-    return this.isLoggedIn;
+    return this.currentUserValue !== null;
   }
 } 
