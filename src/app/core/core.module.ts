@@ -1,11 +1,16 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+
+// Services
+import { AuthService } from './services/auth.service';
 import { AlumnosService } from './services/alumnos.service';
-import { CursosService } from './services/cursos.service';
 import { ClasesService } from './services/clases.service';
-import { AuthService } from '../services/auth.service';
-import { AuthGuard } from '../guards/auth.guard';
+import { CursosService } from './services/cursos.service';
+
+// Guards
+import { AuthGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 @NgModule({
   declarations: [],
@@ -14,11 +19,12 @@ import { AuthGuard } from '../guards/auth.guard';
     HttpClientModule
   ],
   providers: [
-    AlumnosService,
-    CursosService,
-    ClasesService,
     AuthService,
-    AuthGuard
+    AlumnosService,
+    ClasesService,
+    CursosService,
+    AuthGuard,
+    AdminGuard
   ],
   exports: [
     HttpClientModule

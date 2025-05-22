@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UsuariosService } from '../../services/usuarios.service';
-import { User } from '../../../core/services/auth.service';
+import { User } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-lista-usuarios',

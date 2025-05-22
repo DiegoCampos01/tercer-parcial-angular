@@ -7,14 +7,50 @@ export interface Nota {
   cursoId: number;
   calificacion: number;
   fecha: Date;
+  alumno?: {
+    nombre: string;
+    apellido: string;
+  };
+  curso?: {
+    nombre: string;
+  };
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotasService {
-  private notas: Nota[] = [];
-  private notasSubject = new BehaviorSubject<Nota[]>([]);
+  private notas: Nota[] = [
+    {
+      id: 1,
+      alumnoId: 1,
+      cursoId: 1,
+      calificacion: 8.5,
+      fecha: new Date(),
+      alumno: {
+        nombre: 'Juan',
+        apellido: 'Pérez'
+      },
+      curso: {
+        nombre: 'Matemáticas'
+      }
+    },
+    {
+      id: 2,
+      alumnoId: 2,
+      cursoId: 1,
+      calificacion: 9.0,
+      fecha: new Date(),
+      alumno: {
+        nombre: 'María',
+        apellido: 'González'
+      },
+      curso: {
+        nombre: 'Matemáticas'
+      }
+    }
+  ];
+  private notasSubject = new BehaviorSubject<Nota[]>(this.notas);
   private readonly STORAGE_KEY = 'notas_data';
 
   constructor() {
@@ -28,8 +64,6 @@ export class NotasService {
         ...nota,
         fecha: new Date(nota.fecha)
       }));
-    } else {
-      this.notas = [];
     }
     this.notasSubject.next(this.notas);
   }
@@ -76,9 +110,7 @@ export class NotasService {
   }
 
   private generarNuevoId(): number {
-    return this.notas.length > 0 
-      ? Math.max(...this.notas.map(n => n.id)) + 1 
-      : 1;
+    return Math.max(...this.notas.map(n => n.id), 0) + 1;
   }
 
   getEstadoNota(calificacion: number): string {

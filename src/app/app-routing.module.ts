@@ -1,11 +1,11 @@
-import { Routes } from '@angular/router';
-import { LoginComponent } from './components/login/login.component';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
-import { LayoutComponent } from './core/components/layout/layout.component';
 import { AdminGuard } from './core/guards/admin.guard';
+import { LayoutComponent } from './core/components/layout/layout.component';
 
 export const routes: Routes = [
-  { 
+  {
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthRoutingModule)
   },
@@ -37,14 +37,15 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'alumnos',
+        redirectTo: 'alumnos/lista',
         pathMatch: 'full'
       }
     ]
-  },
-  {
-    path: 'dashboard',
-    loadComponent: () => import('./modules/dashboard/dashboard.component').then(m => m.DashboardComponent),
-    canActivate: [AuthGuard]
   }
 ];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { } 

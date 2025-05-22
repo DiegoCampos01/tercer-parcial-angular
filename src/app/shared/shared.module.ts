@@ -1,45 +1,44 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+
+// Material Modules
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [],
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
-    MatToolbarModule,
-    MatSidenavModule,
+    RouterModule,
     MatButtonModule,
-    MatIconModule,
-    MatListModule,
-    MatTableModule,
     MatFormFieldModule,
     MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule
+    MatTableModule,
+    MatIconModule,
+    MatSnackBarModule,
+    MatSelectModule
   ],
   exports: [
+    CommonModule,
+    FormsModule,
     ReactiveFormsModule,
-    MatToolbarModule,
-    MatSidenavModule,
+    RouterModule,
     MatButtonModule,
-    MatIconModule,
-    MatListModule,
-    MatTableModule,
     MatFormFieldModule,
     MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule
+    MatTableModule,
+    MatIconModule,
+    MatSnackBarModule,
+    MatSelectModule
   ]
 })
 export class SharedModule { } 
