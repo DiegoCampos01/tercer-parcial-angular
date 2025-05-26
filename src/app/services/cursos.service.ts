@@ -27,7 +27,8 @@ export class CursosService {
           descripcion: 'Curso avanzado de matemáticas',
           profesor: 'Dr. García',
           duracion: 60,
-          alumnos: []
+          alumnos: [],
+          cupo: 30
         },
         {
           id: 2,
@@ -35,7 +36,8 @@ export class CursosService {
           descripcion: 'Desarrollo web moderno',
           profesor: 'Ing. Martínez',
           duracion: 40,
-          alumnos: []
+          alumnos: [],
+          cupo: 30
         },
         {
           id: 3,
@@ -43,7 +45,8 @@ export class CursosService {
           descripcion: 'Técnicas avanzadas de pelado de naranjas',
           profesor: 'Abe Simpson',
           duracion: 40,
-          alumnos: []
+          alumnos: [],
+          cupo: 30
         }
       ];
     }
@@ -67,7 +70,8 @@ export class CursosService {
     const nuevoCurso: Curso = {
       ...curso,
       id: this.generarNuevoId(),
-      alumnos: []
+      alumnos: [],
+      cupo: 30 // Valor por defecto para el cupo
     };
     this.cursos.push(nuevoCurso);
     this.guardarCursos();

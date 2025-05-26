@@ -38,7 +38,8 @@ export class AbmCursosComponent implements OnInit {
       nombre: ['', [Validators.required, Validators.minLength(3)]],
       descripcion: ['', [Validators.required, Validators.minLength(10)]],
       profesor: ['', [Validators.required, Validators.minLength(3)]],
-      duracion: ['', [Validators.required, Validators.min(1)]]
+      duracion: ['', [Validators.required, Validators.min(1)]],
+      cupo: [30, [Validators.required, Validators.min(1), Validators.max(100)]]
     });
   }
 

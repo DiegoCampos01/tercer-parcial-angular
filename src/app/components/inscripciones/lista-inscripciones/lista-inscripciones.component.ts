@@ -40,15 +40,16 @@ export class ListaInscripcionesComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    const paramsSub = this.route.params.subscribe(params => {
-      if (params['id']) {
-        this.alumnoId = +params['id'];
-        this.cargarDatosAlumno();
-      } else {
-        this.cargarListaGeneral();
-      }
-    });
-    this.subscriptions.push(paramsSub);
+    this.subscriptions.push(
+      this.route.params.subscribe(params => {
+        this.alumnoId = params['id'] ? +params['id'] : null;
+        if (this.alumnoId) {
+          this.cargarDatosAlumno();
+        } else {
+          this.cargarCursosDisponibles();
+        }
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -67,21 +68,12 @@ export class ListaInscripcionesComponent implements OnInit, OnDestroy {
     }
   }
 
-  cargarListaGeneral(): void {
-    this.cursosService.getCursos().subscribe(cursos => {
-      this.cursosDisponibles = cursos.map(curso => ({
-        ...curso,
-        cuposDisponibles: 29 - (curso.alumnos?.length || 0)
-      }));
-    });
-  }
-
   cargarCursosDisponibles(): void {
     this.cursosService.getCursos().subscribe(cursos => {
       this.cursosDisponibles = cursos.map(curso => ({
         ...curso,
-        cuposDisponibles: 29 - (curso.alumnos?.length || 0),
-        inscrito: this.inscripcionesService.estaInscrito(curso.id, this.alumnoId!)
+        inscrito: this.alumnoId ? this.inscripcionesService.estaInscrito(curso.id, this.alumnoId) : false,
+        cuposDisponibles: curso.cupo - (curso.alumnos?.length || 0)
       }));
     });
   }
@@ -90,6 +82,7 @@ export class ListaInscripcionesComponent implements OnInit, OnDestroy {
     if (this.alumnoId && curso.cuposDisponibles > 0 && !curso.inscrito) {
       this.inscripcionesService.inscribirAlumno(curso.id, this.alumnoId);
       this.cargarCursosDisponibles();
+      this.router.navigate(['/notas/lista']);
     }
   }
 

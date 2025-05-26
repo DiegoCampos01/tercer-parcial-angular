@@ -34,31 +34,21 @@
     <ng-container matColumnDef="acciones">
       <th mat-header-cell *matHeaderCellDef>Acciones</th>
       <td mat-cell *matCellDef="let curso">
-        <ng-container *ngIf="alumno; else verDetalles">
-          <button *ngIf="!curso.inscrito"
-                  mat-raised-button 
-                  color="primary" 
-                  (click)="inscribirse(curso)" 
-                  [disabled]="curso.cuposDisponibles === 0">
-            <mat-icon>school</mat-icon>
-            Inscribirse
-          </button>
-          <button *ngIf="curso.inscrito"
-                  mat-raised-button 
-                  color="warn" 
-                  (click)="desinscribirse(curso)">
-            <mat-icon>cancel</mat-icon>
-            Desinscribirse
-          </button>
-        </ng-container>
-        <ng-template #verDetalles>
-          <button mat-raised-button 
-                  color="primary" 
-                  [routerLink]="['/inscripciones/alumno', curso.id]">
-            <mat-icon>visibility</mat-icon>
-            Ver Detalles
-          </button>
-        </ng-template>
+        <button mat-raised-button color="primary" 
+                (click)="inscribirse(curso)"
+                *ngIf="!curso.inscrito && curso.cuposDisponibles > 0">
+          <mat-icon>how_to_reg</mat-icon>
+          Inscribirse
+        </button>
+        <button mat-raised-button color="warn" 
+                (click)="desinscribirse(curso)"
+                *ngIf="curso.inscrito">
+          <mat-icon>person_remove</mat-icon>
+          Desinscribirse
+        </button>
+        <span *ngIf="!curso.inscrito && curso.cuposDisponibles === 0" class="no-cupos">
+          Sin cupos disponibles
+        </span>
       </td>
     </ng-container>
 
@@ -66,7 +56,7 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
 
-  <div class="actions-container" *ngIf="alumno">
+  <div class="actions">
     <button mat-button color="primary" (click)="volver()">
       <mat-icon>arrow_back</mat-icon>
       Volver a la lista de alumnos

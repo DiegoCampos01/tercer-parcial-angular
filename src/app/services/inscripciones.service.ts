@@ -48,8 +48,8 @@ export class InscripcionesService {
     this.inscripcionesSubject.next(this.inscripciones);
   }
 
-  getInscripciones(): Observable<Inscripcion[]> {
-    return this.inscripcionesSubject.asObservable();
+  getInscripciones(): Inscripcion[] {
+    return this.inscripciones;
   }
 
   getInscripcionesPorAlumno(alumnoId: number): Observable<Inscripcion[]> {
