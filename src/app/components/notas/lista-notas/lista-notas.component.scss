@@ -1,0 +1,70 @@
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h2 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+}
+
+.mat-elevation-z8 {
+  width: 100%;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-mdc-row:hover {
+  background-color: #f5f5f5;
+}
+
+th.mat-header-cell {
+  background-color: #f8f9fa;
+  color: #333;
+  font-weight: 600;
+  padding: 12px 16px;
+}
+
+td.mat-cell {
+  padding: 12px 16px;
+}
+
+.nota-input {
+  width: 100px;
+  margin: -1em 0;
+}
+
+.nota-success, .estado-success {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.nota-danger, .estado-danger {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.estado-success, .estado-danger {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.estado-success {
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.estado-danger {
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+button[mat-icon-button] {
+  margin: 0 4px;
+} 

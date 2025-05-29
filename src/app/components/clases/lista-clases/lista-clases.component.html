@@ -1,0 +1,70 @@
+<div class="container">
+  <h2>Lista de Clases</h2>
+  
+  <div class="header-actions">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar</mat-label>
+      <input matInput [(ngModel)]="filtro" (ngModelChange)="aplicarFiltro()" placeholder="Buscar por título, descripción, aula o curso">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" class="add-button" routerLink="/clases/nueva">
+      <mat-icon>add</mat-icon>
+      Agregar Clase
+    </button>
+  </div>
+
+  <table mat-table [dataSource]="clasesFiltradas" class="mat-elevation-z8">
+    <!-- ID Column -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>ID</th>
+      <td mat-cell *matCellDef="let clase">{{clase.id}}</td>
+    </ng-container>
+
+    <!-- Título Column -->
+    <ng-container matColumnDef="titulo">
+      <th mat-header-cell *matHeaderCellDef>Título</th>
+      <td mat-cell *matCellDef="let clase">{{clase.titulo}}</td>
+    </ng-container>
+
+    <!-- Descripción Column -->
+    <ng-container matColumnDef="descripcion">
+      <th mat-header-cell *matHeaderCellDef>Descripción</th>
+      <td mat-cell *matCellDef="let clase">{{clase.descripcion}}</td>
+    </ng-container>
+
+    <!-- Fecha Column -->
+    <ng-container matColumnDef="fecha">
+      <th mat-header-cell *matHeaderCellDef>Fecha</th>
+      <td mat-cell *matCellDef="let clase">{{clase.fecha | date:'short'}}</td>
+    </ng-container>
+
+    <!-- Duración Column -->
+    <ng-container matColumnDef="duracion">
+      <th mat-header-cell *matHeaderCellDef>Duración (min)</th>
+      <td mat-cell *matCellDef="let clase">{{clase.duracion}}</td>
+    </ng-container>
+
+    <!-- Aula Column -->
+    <ng-container matColumnDef="aula">
+      <th mat-header-cell *matHeaderCellDef>Aula</th>
+      <td mat-cell *matCellDef="let clase">{{clase.aula}}</td>
+    </ng-container>
+
+    <!-- Acciones Column -->
+    <ng-container matColumnDef="acciones">
+      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let clase">
+        <button mat-icon-button color="accent" (click)="editarClase(clase)" matTooltip="Editar">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="eliminarClase(clase)" matTooltip="Eliminar">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div> 

@@ -1,0 +1,11 @@
+<mat-toolbar color="primary">
+  <span>Universidad XYZ</span>
+  <span class="spacer"></span>
+  
+  <ng-container *ngFor="let item of menuItems">
+    <a mat-button [routerLink]="item.path" routerLinkActive="active">
+      <mat-icon>{{item.icon}}</mat-icon>
+      {{item.label}}
+    </a>
+  </ng-container>
+</mat-toolbar> 

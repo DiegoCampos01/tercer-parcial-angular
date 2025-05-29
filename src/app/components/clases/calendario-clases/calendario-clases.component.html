@@ -1,0 +1,29 @@
+<div class="container">
+  <h2>Calendario de Clases</h2>
+
+  <div class="calendar-container">
+    <div class="calendar-header">
+      <div class="time-column"></div>
+      <div *ngFor="let dia of diasSemana" class="day-header">
+        {{ dia }}
+      </div>
+    </div>
+
+    <div class="calendar-body">
+      <div *ngFor="let hora of horas" class="calendar-row">
+        <div class="time-column">{{ hora }}</div>
+        <div *ngFor="let dia of [0,1,2,3,4,5,6]" class="day-cell">
+          <mat-card *ngFor="let clase of getClasesPorHora(dia, hora)" 
+                    class="clase-card"
+                    (click)="verDetalleClase(clase)">
+            <mat-card-content>
+              <h3>{{ clase.titulo }}</h3>
+              <p>{{ getNombreCurso(clase.cursoId) }}</p>
+              <p>Aula: {{ clase.aula }}</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
