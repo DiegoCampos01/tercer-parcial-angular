@@ -7,20 +7,20 @@ import { AuthService } from '../services/auth.service';
 })
 export class AuthGuard implements CanActivate {
   constructor(
-    private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    const isAuthenticated = this.authService.isAuthenticated();
-    
-    if (!isAuthenticated && state.url !== '/login') {
+    if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return false;
     }
 
-    if (isAuthenticated && state.url === '/login') {
-      this.router.navigate(['/alumnos']);
+    // Verificar si la ruta requiere rol de admin
+    const requiereAdmin = route.data['requiereAdmin'] === true;
+    if (requiereAdmin && !this.authService.isAdmin()) {
+      this.router.navigate(['/acceso-denegado']);
       return false;
     }
 

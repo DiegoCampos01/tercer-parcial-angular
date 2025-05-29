@@ -26,7 +26,7 @@
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Email</mat-label>
-      <input matInput formControlName="email" placeholder="Ingrese el email">
+      <input matInput formControlName="email" placeholder="Ingrese el email" type="email">
       <mat-error *ngIf="alumnoForm.get('email')?.hasError('required')">
         El email es requerido
       </mat-error>
@@ -37,7 +37,7 @@
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Fecha de Nacimiento</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento">
+      <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento" placeholder="Seleccione una fecha">
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
       <mat-error *ngIf="alumnoForm.get('fechaNacimiento')?.hasError('required')">
@@ -47,8 +47,8 @@
 
     <div class="button-container">
       <button mat-button type="button" (click)="cancelar()">Cancelar</button>
-      <button mat-raised-button color="primary" type="submit" [disabled]="!alumnoForm.valid">
-        {{ esEdicion ? 'Actualizar' : 'Guardar' }}
+      <button mat-raised-button color="primary" type="submit" [disabled]="alumnoForm.invalid">
+        {{ esEdicion ? 'Guardar Cambios' : 'Crear Alumno' }}
       </button>
     </div>
   </form>

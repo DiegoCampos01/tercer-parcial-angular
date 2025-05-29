@@ -27,31 +27,31 @@ import { AuthService, User } from '../../services/auth.service';
           [opened]="true">
         <mat-toolbar>Menú</mat-toolbar>
         <mat-nav-list>
-          <a mat-list-item routerLink="/alumnos/lista">
+          <a mat-list-item routerLink="/alumnos" routerLinkActive="active">
             <mat-icon>people</mat-icon>
             <span>Alumnos</span>
           </a>
-          <a mat-list-item routerLink="/cursos/lista">
+          <a mat-list-item routerLink="/cursos" routerLinkActive="active">
             <mat-icon>school</mat-icon>
             <span>Cursos</span>
           </a>
-          <a mat-list-item routerLink="/inscripciones">
+          <a mat-list-item routerLink="/inscripciones" routerLinkActive="active">
             <mat-icon>assignment</mat-icon>
             <span>Inscripciones</span>
           </a>
-          <a mat-list-item routerLink="/notas/lista">
+          <a mat-list-item routerLink="/notas" routerLinkActive="active">
             <mat-icon>grade</mat-icon>
             <span>Notas</span>
           </a>
           <ng-container *ngIf="isAdmin">
-            <a mat-list-item routerLink="/usuarios">
+            <a mat-list-item routerLink="/usuarios" routerLinkActive="active">
               <mat-icon>admin_panel_settings</mat-icon>
               <span>Usuarios</span>
             </a>
           </ng-container>
           <a mat-list-item (click)="logout()">
             <mat-icon>exit_to_app</mat-icon>
-            <span>Logout</span>
+            <span>Cerrar Sesión</span>
           </a>
         </mat-nav-list>
       </mat-sidenav>
@@ -85,6 +85,9 @@ import { AuthService, User } from '../../services/auth.service';
       align-items: center;
       gap: 10px;
     }
+    .active {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
   `]
 })
 export class LayoutComponent implements OnInit {
@@ -99,12 +102,12 @@ export class LayoutComponent implements OnInit {
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
-      this.isAdmin = this.authService.isAdmin();
+      this.isAdmin = user?.role === 'admin';
     });
   }
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/auth']);
+    this.router.navigate(['/login']);
   }
 } 

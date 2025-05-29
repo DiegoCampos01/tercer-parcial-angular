@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,6 +13,7 @@ import { CursosService } from '../../../services/cursos.service';
 import { InscripcionesService } from '../../../services/inscripciones.service';
 import { NotasService } from '../../../services/notas.service';
 import { Curso } from '../../../models/curso.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-lista-alumnos',
@@ -30,10 +31,11 @@ import { Curso } from '../../../models/curso.model';
   templateUrl: './lista-alumnos.component.html',
   styleUrls: ['./lista-alumnos.component.scss']
 })
-export class ListaAlumnosComponent implements OnInit {
+export class ListaAlumnosComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['id', 'nombre', 'email', 'fechaNacimiento', 'cursosInscritos', 'acciones'];
   alumnos: Alumno[] = [];
   cursos: { [key: number]: Curso } = {};
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private alumnosService: AlumnosService,
@@ -44,6 +46,17 @@ export class ListaAlumnosComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarDatos();
+    
+    // Suscribirse a cambios en las inscripciones
+    this.subscriptions.push(
+      this.inscripcionesService.getInscripciones().subscribe(() => {
+        this.cargarDatos();
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   cargarDatos(): void {

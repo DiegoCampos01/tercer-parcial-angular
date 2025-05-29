@@ -1,14 +1,11 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './components/login/login.component';
 import { AuthGuard } from './core/guards/auth.guard';
-import { LayoutComponent } from './core/components/layout/layout.component';
 import { AdminGuard } from './core/guards/admin.guard';
+import { LoginComponent } from './components/auth/login/login.component';
+import { LayoutComponent } from './core/components/layout/layout.component';
 
 export const routes: Routes = [
-  { 
-    path: 'auth',
-    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthRoutingModule)
-  },
+  { path: 'login', component: LoginComponent },
   {
     path: '',
     component: LayoutComponent,
@@ -16,35 +13,71 @@ export const routes: Routes = [
     children: [
       {
         path: 'alumnos',
-        loadChildren: () => import('./features/alumnos/alumnos.module').then(m => m.AlumnosModule)
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./components/alumnos/lista-alumnos/lista-alumnos.component').then(m => m.ListaAlumnosComponent)
+          },
+          {
+            path: 'nuevo',
+            loadComponent: () => import('./components/alumnos/abm-alumnos/abm-alumnos.component').then(m => m.AbmAlumnosComponent)
+          },
+          {
+            path: 'editar/:id',
+            loadComponent: () => import('./components/alumnos/abm-alumnos/abm-alumnos.component').then(m => m.AbmAlumnosComponent)
+          }
+        ]
       },
       {
         path: 'cursos',
-        loadChildren: () => import('./features/cursos/cursos.module').then(m => m.CursosModule)
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./components/cursos/lista-cursos/lista-cursos.component').then(m => m.ListaCursosComponent)
+          },
+          {
+            path: 'nuevo',
+            loadComponent: () => import('./components/cursos/abm-cursos/abm-cursos.component').then(m => m.AbmCursosComponent)
+          },
+          {
+            path: 'editar/:id',
+            loadComponent: () => import('./components/cursos/abm-cursos/abm-cursos.component').then(m => m.AbmCursosComponent)
+          }
+        ]
       },
       {
         path: 'inscripciones',
-        loadChildren: () => import('./features/inscripciones/inscripciones.module').then(m => m.InscripcionesModule)
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./components/inscripciones/lista-inscripciones/lista-inscripciones.component').then(m => m.ListaInscripcionesComponent)
+          },
+          {
+            path: 'alumno/:id',
+            loadComponent: () => import('./components/inscripciones/nueva-inscripcion/nueva-inscripcion.component').then(m => m.NuevaInscripcionComponent)
+          }
+        ]
       },
       {
         path: 'notas',
-        loadChildren: () => import('./features/notas/notas.module').then(m => m.NotasModule)
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./components/notas/lista-notas/lista-notas.component').then(m => m.ListaNotasComponent)
+          },
+          {
+            path: 'editar/:alumnoId/:cursoId',
+            loadComponent: () => import('./components/notas/editar-nota/editar-nota.component').then(m => m.EditarNotaComponent)
+          }
+        ]
       },
       {
         path: 'usuarios',
-        canActivate: [AdminGuard],
-        loadChildren: () => import('./features/usuarios/usuarios.module').then(m => m.UsuariosModule)
+        loadChildren: () => import('./features/usuarios/usuarios.module').then(m => m.UsuariosModule),
+        canActivate: [AuthGuard, AdminGuard]
       },
-      {
-        path: '',
-        redirectTo: 'alumnos',
-        pathMatch: 'full'
-      }
+      { path: '', redirectTo: 'alumnos', pathMatch: 'full' }
     ]
   },
-  {
-    path: 'dashboard',
-    loadComponent: () => import('./modules/dashboard/dashboard.component').then(m => m.DashboardComponent),
-    canActivate: [AuthGuard]
-  }
+  { path: '**', redirectTo: '/login' }
 ];

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
@@ -13,6 +13,7 @@ import { NotasService } from '../../services/notas.service';
 import { AlumnosService } from '../../../../services/alumnos.service';
 import { CursosService } from '../../../../services/cursos.service';
 import { InscripcionesService } from '../../../../services/inscripciones.service';
+import { Subscription } from 'rxjs';
 
 interface NotaViewModel {
   id?: number;
@@ -43,11 +44,12 @@ interface NotaViewModel {
   templateUrl: './lista-notas.component.html',
   styleUrls: ['./lista-notas.component.scss']
 })
-export class ListaNotasComponent implements OnInit {
+export class ListaNotasComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['alumno', 'curso', 'calificacion', 'estado', 'acciones'];
   notas: NotaViewModel[] = [];
   notaSeleccionada: NotaViewModel | null = null;
   nuevaNota: number | null = null;
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private alumnosService: AlumnosService,
@@ -61,29 +63,34 @@ export class ListaNotasComponent implements OnInit {
     this.cargarNotas();
   }
 
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
   cargarNotas(): void {
-    // Obtener todas las inscripciones
-    const inscripciones = this.inscripcionesService.getInscripciones();
-    
-    this.notas = [];
-    inscripciones.forEach(inscripcion => {
-      const alumno = this.alumnosService.getAlumnoById(inscripcion.alumnoId);
-      const curso = this.cursosService.getCursoById(inscripcion.cursoId);
-      
-      if (alumno && curso) {
-        const notaExistente = this.notasService.getNotaPorAlumnoYCurso(inscripcion.alumnoId, inscripcion.cursoId);
-        
-        this.notas.push({
-          id: notaExistente?.id,
-          alumnoId: inscripcion.alumnoId,
-          cursoId: inscripcion.cursoId,
-          nombreAlumno: `${alumno.nombre} ${alumno.apellido}`,
-          nombreCurso: curso.nombre,
-          calificacion: notaExistente?.calificacion || null,
-          estado: notaExistente ? this.getEstadoNota(notaExistente.calificacion) : 'Pendiente'
+    this.subscriptions.push(
+      this.inscripcionesService.getInscripciones().subscribe(inscripciones => {
+        this.notas = [];
+        inscripciones.forEach(inscripcion => {
+          const alumno = this.alumnosService.getAlumnoById(inscripcion.alumnoId);
+          const curso = this.cursosService.getCursoById(inscripcion.cursoId);
+          
+          if (alumno && curso) {
+            const notaExistente = this.notasService.getNotaPorAlumnoYCurso(inscripcion.alumnoId, inscripcion.cursoId);
+            
+            this.notas.push({
+              id: notaExistente?.id,
+              alumnoId: inscripcion.alumnoId,
+              cursoId: inscripcion.cursoId,
+              nombreAlumno: `${alumno.nombre} ${alumno.apellido}`,
+              nombreCurso: curso.nombre,
+              calificacion: notaExistente?.calificacion || null,
+              estado: notaExistente ? this.getEstadoNota(notaExistente.calificacion) : 'Pendiente'
+            });
+          }
         });
-      }
-    });
+      })
+    );
   }
 
   editarNota(nota: NotaViewModel): void {

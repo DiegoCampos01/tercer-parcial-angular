@@ -4,14 +4,9 @@ import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
 
 const routes: Routes = [
-  {
-    path: '',
-    children: [
-      { path: 'lista', loadComponent: () => import('../../components/cursos/lista-cursos/lista-cursos.component').then(m => m.ListaCursosComponent) },
-      { path: 'nuevo', loadComponent: () => import('../../components/cursos/abm-cursos/abm-cursos.component').then(m => m.AbmCursosComponent) },
-      { path: '', redirectTo: 'lista', pathMatch: 'full' }
-    ]
-  }
+  { path: '', redirectTo: 'lista', pathMatch: 'full' },
+  { path: 'lista', loadComponent: () => import('../../components/cursos/lista-cursos/lista-cursos.component').then(m => m.ListaCursosComponent) },
+  { path: 'nuevo', loadComponent: () => import('../../components/cursos/abm-cursos/abm-cursos.component').then(m => m.AbmCursosComponent) }
 ];
 
 @NgModule({

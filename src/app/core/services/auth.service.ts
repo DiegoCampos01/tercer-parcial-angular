@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, tap, throwError } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 export interface User {
   id: number;
@@ -21,33 +20,32 @@ export interface LoginResponse {
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
-  private readonly API_URL = environment.apiUrl;
 
   // Credenciales de prueba
   private readonly TEST_USERS = {
     admin: {
-      username: 'admin',
+      username: 'admin@admin.com',
       password: 'admin123',
       user: {
         id: 1,
         username: 'admin',
-        email: 'admin@academia.com',
+        email: 'admin@admin.com',
         role: 'admin' as const
       }
     },
     user: {
-      username: 'user',
+      username: 'usuario@usuario.com',
       password: 'user123',
       user: {
         id: 2,
-        username: 'user',
-        email: 'user@academia.com',
+        username: 'usuario',
+        email: 'usuario@usuario.com',
         role: 'user' as const
       }
     }
   };
 
-  constructor(private http: HttpClient) {
+  constructor() {
     this.loadStoredUser();
   }
 
@@ -59,7 +57,7 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<LoginResponse> {
-    // Simulación de autenticación mientras se configura la API
+    // Simulación de autenticación
     const testUser = Object.values(this.TEST_USERS).find(
       u => u.username === username && u.password === password
     );
@@ -78,7 +76,6 @@ export class AuthService {
       );
     }
 
-    // Si las credenciales no coinciden, devolver un error
     return throwError(() => new Error('Credenciales inválidas'));
   }
 
@@ -88,7 +85,7 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
-  isAuthenticated(): boolean {
+  isLoggedIn(): boolean {
     return !!this.currentUserSubject.value;
   }
 
@@ -96,11 +93,11 @@ export class AuthService {
     return this.currentUserSubject.value?.role === 'admin';
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
-  }
-
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
   }
 } 

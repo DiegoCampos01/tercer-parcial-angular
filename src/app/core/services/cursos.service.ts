@@ -26,7 +26,8 @@ export class CursosService {
           descripcion: 'Curso avanzado de matemáticas',
           profesor: 'Dr. García',
           duracion: 60,
-          alumnos: []
+          alumnos: [],
+          cupo: 30
         },
         {
           id: 2,
@@ -34,16 +35,22 @@ export class CursosService {
           descripcion: 'Desarrollo web moderno',
           profesor: 'Ing. Martínez',
           duracion: 40,
-          alumnos: []
+          alumnos: [],
+          cupo: 30
         }
       ];
     }
     this.guardarCursos();
+    this.cursosSubject.next(this.cursos);
   }
 
   private guardarCursos(): void {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.cursos));
     this.cursosSubject.next(this.cursos);
+  }
+
+  private generarNuevoId(): number {
+    return this.cursos.length > 0 ? Math.max(...this.cursos.map(c => c.id)) + 1 : 1;
   }
 
   getCursos(): Observable<Curso[]> {
@@ -58,7 +65,8 @@ export class CursosService {
     const nuevoCurso: Curso = {
       ...curso,
       id: this.generarNuevoId(),
-      alumnos: []
+      alumnos: [],
+      cupo: curso.cupo || 30 // Aseguramos que siempre haya un cupo definido
     };
     this.cursos.push(nuevoCurso);
     this.guardarCursos();
@@ -67,7 +75,11 @@ export class CursosService {
   actualizarCurso(id: number, curso: Partial<Curso>): void {
     const index = this.cursos.findIndex(c => c.id === id);
     if (index !== -1) {
-      this.cursos[index] = { ...this.cursos[index], ...curso };
+      this.cursos[index] = {
+        ...this.cursos[index],
+        ...curso,
+        cupo: curso.cupo || this.cursos[index].cupo || 30 // Mantenemos el cupo existente o usamos uno por defecto
+      };
       this.guardarCursos();
     }
   }
@@ -93,11 +105,5 @@ export class CursosService {
       curso.alumnos = curso.alumnos.filter(id => id !== alumnoId);
       this.guardarCursos();
     }
-  }
-
-  private generarNuevoId(): number {
-    return this.cursos.length > 0 
-      ? Math.max(...this.cursos.map(c => c.id)) + 1 
-      : 1;
   }
 } 

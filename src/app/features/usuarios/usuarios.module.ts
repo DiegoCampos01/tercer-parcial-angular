@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { RouterModule, Routes } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,25 +8,34 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-
-import { ListaUsuariosComponent } from './components/lista-usuarios/lista-usuarios.component';
-import { AbmUsuariosComponent } from './components/abm-usuarios/abm-usuarios.component';
-import { AdminGuard } from '../../core/guards/admin.guard';
+import { MatCardModule } from '@angular/material/card';
+import { AdminGuard } from '../../guards/admin.guard';
 
 const routes: Routes = [
   {
     path: '',
     children: [
-      { path: '', component: ListaUsuariosComponent },
-      { path: 'nuevo', component: AbmUsuariosComponent },
-      { path: 'editar/:id', component: AbmUsuariosComponent }
-    ],
-    canActivate: [AdminGuard]
+      {
+        path: '',
+        loadChildren: () => import('./pages/lista-usuarios/lista-usuarios.module').then(m => m.ListaUsuariosModule),
+        canActivate: [AdminGuard]
+      },
+      {
+        path: 'nuevo',
+        loadChildren: () => import('./pages/crear-usuario/crear-usuario.module').then(m => m.CrearUsuarioModule),
+        canActivate: [AdminGuard]
+      },
+      {
+        path: 'editar/:id',
+        loadChildren: () => import('./pages/crear-usuario/crear-usuario.module').then(m => m.CrearUsuarioModule),
+        canActivate: [AdminGuard]
+      }
+    ]
   }
 ];
 
 @NgModule({
+  declarations: [],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -37,9 +46,7 @@ const routes: Routes = [
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatSnackBarModule,
-    ListaUsuariosComponent,
-    AbmUsuariosComponent
+    MatCardModule
   ]
 })
 export class UsuariosModule { } 

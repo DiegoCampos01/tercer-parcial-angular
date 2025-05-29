@@ -6,24 +6,17 @@ import { ListaAlumnosComponent } from '../../components/alumnos/lista-alumnos/li
 import { AbmAlumnosComponent } from '../../components/alumnos/abm-alumnos/abm-alumnos.component';
 
 const routes: Routes = [
-  {
-    path: '',
-    children: [
-      { path: 'lista', component: ListaAlumnosComponent },
-      { path: 'nuevo', component: AbmAlumnosComponent },
-      { path: 'editar/:id', component: AbmAlumnosComponent },
-      { path: '', redirectTo: 'lista', pathMatch: 'full' }
-    ]
-  }
+  { path: '', redirectTo: 'lista', pathMatch: 'full' },
+  { path: 'lista', component: ListaAlumnosComponent },
+  { path: 'nuevo', component: AbmAlumnosComponent },
+  { path: 'editar/:id', component: AbmAlumnosComponent }
 ];
 
 @NgModule({
-  declarations: [],
   imports: [
     CommonModule,
     SharedModule,
     RouterModule.forChild(routes)
-  ],
-  exports: [RouterModule]
+  ]
 })
 export class AlumnosModule { } 

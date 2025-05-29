@@ -5,19 +5,8 @@ import { SharedModule } from '../../shared/shared.module';
 import { ListaInscripcionesComponent } from '../../components/inscripciones/lista-inscripciones/lista-inscripciones.component';
 
 const routes: Routes = [
-  {
-    path: '',
-    children: [
-      {
-        path: 'alumno/:id',
-        component: ListaInscripcionesComponent
-      },
-      {
-        path: '',
-        component: ListaInscripcionesComponent
-      }
-    ]
-  }
+  { path: '', component: ListaInscripcionesComponent },
+  { path: 'alumno/:id', component: ListaInscripcionesComponent }
 ];
 
 @NgModule({

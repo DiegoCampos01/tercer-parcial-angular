@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, map, tap, of } from 'rxjs';
 import { Curso } from '../models/curso.model';
 import { CursosService } from './cursos.service';
+import { AlumnosService } from './alumnos.service';
 
 export interface Inscripcion {
   id: number;
@@ -15,88 +17,86 @@ export interface Inscripcion {
 })
 export class InscripcionesService {
   private readonly STORAGE_KEY = 'inscripciones';
-  private inscripciones: Inscripcion[] = [];
   private inscripcionesSubject = new BehaviorSubject<Inscripcion[]>([]);
 
-  constructor(private cursosService: CursosService) {
+  constructor(
+    private cursosService: CursosService,
+    private alumnosService: AlumnosService
+  ) {
     this.cargarInscripciones();
   }
 
   private cargarInscripciones(): void {
     const inscripcionesGuardadas = localStorage.getItem(this.STORAGE_KEY);
     if (inscripcionesGuardadas) {
-      this.inscripciones = JSON.parse(inscripcionesGuardadas).map((inscripcion: any) => ({
+      const inscripciones = JSON.parse(inscripcionesGuardadas);
+      this.inscripcionesSubject.next(inscripciones.map((inscripcion: any) => ({
         ...inscripcion,
         fechaInscripcion: new Date(inscripcion.fechaInscripcion)
-      }));
-    } else {
-      // Datos de ejemplo
-      this.inscripciones = [
-        {
-          id: 1,
-          cursoId: 1,
-          alumnoId: 1,
-          fechaInscripcion: new Date()
-        }
-      ];
+      })));
     }
-    this.inscripcionesSubject.next(this.inscripciones);
   }
 
   private guardarInscripciones(): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.inscripciones));
-    this.inscripcionesSubject.next(this.inscripciones);
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.inscripcionesSubject.value));
   }
 
-  getInscripciones(): Inscripcion[] {
-    return this.inscripciones;
+  private generarNuevoId(): number {
+    const inscripciones = this.inscripcionesSubject.value;
+    return inscripciones.length > 0 ? Math.max(...inscripciones.map(i => i.id)) + 1 : 1;
+  }
+
+  getInscripciones(): Observable<Inscripcion[]> {
+    return this.inscripcionesSubject.asObservable();
   }
 
   getInscripcionesPorAlumno(alumnoId: number): Observable<Inscripcion[]> {
-    return new Observable(observer => {
-      const inscripciones = this.inscripciones.filter(i => i.alumnoId === alumnoId);
-      observer.next(inscripciones);
-      observer.complete();
-    });
+    const inscripciones = this.inscripcionesSubject.value.filter(i => i.alumnoId === alumnoId);
+    return of(inscripciones);
   }
 
   getInscripcionesPorCurso(cursoId: number): Observable<Inscripcion[]> {
-    return new Observable(observer => {
-      const inscripciones = this.inscripciones.filter(i => i.cursoId === cursoId);
-      observer.next(inscripciones);
-      observer.complete();
-    });
+    const inscripciones = this.inscripcionesSubject.value.filter(i => i.cursoId === cursoId);
+    return of(inscripciones);
   }
 
-  inscribirAlumno(cursoId: number, alumnoId: number): void {
-    const nuevoId = Math.max(...this.inscripciones.map(i => i.id), 0) + 1;
+  inscribirAlumno(cursoId: number, alumnoId: number): Observable<void> {
     const nuevaInscripcion: Inscripcion = {
-      id: nuevoId,
+      id: this.generarNuevoId(),
       cursoId,
       alumnoId,
       fechaInscripcion: new Date()
     };
 
-    this.inscripciones.push(nuevaInscripcion);
+    const inscripciones = [...this.inscripcionesSubject.value, nuevaInscripcion];
+    this.inscripcionesSubject.next(inscripciones);
     this.guardarInscripciones();
     
-    // Actualizar el curso con el nuevo alumno
-    this.cursosService.inscribirAlumno(cursoId, alumnoId);
+    // Actualizar las relaciones en los otros servicios
+    this.cursosService.agregarAlumno(cursoId, alumnoId);
+    this.alumnosService.inscribirEnCurso(alumnoId, cursoId);
+
+    return of(void 0);
   }
 
-  desinscribirAlumno(cursoId: number, alumnoId: number): void {
-    this.inscripciones = this.inscripciones.filter(
+  desinscribirAlumno(cursoId: number, alumnoId: number): Observable<void> {
+    const inscripciones = this.inscripcionesSubject.value.filter(
       i => !(i.cursoId === cursoId && i.alumnoId === alumnoId)
     );
+    this.inscripcionesSubject.next(inscripciones);
     this.guardarInscripciones();
-    
-    // Actualizar el curso
-    this.cursosService.desinscribirAlumno(cursoId, alumnoId);
+
+    // Actualizar las relaciones en los otros servicios
+    this.cursosService.removerAlumno(cursoId, alumnoId);
+    this.alumnosService.desinscribirDeCurso(alumnoId, cursoId);
+
+    return of(void 0);
   }
 
-  estaInscrito(cursoId: number, alumnoId: number): boolean {
-    return this.inscripciones.some(
+  estaInscrito(cursoId: number, alumnoId: number): Observable<boolean> {
+    const inscrito = this.inscripcionesSubject.value.some(
       i => i.cursoId === cursoId && i.alumnoId === alumnoId
     );
+    return of(inscrito);
   }
 } 

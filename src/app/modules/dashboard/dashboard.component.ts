@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
-import { User } from '../../models/user.interface';
+import { Usuario } from '../../models/usuario.model';
 import { NavMenuComponent } from '../../components/layout/nav-menu/nav-menu.component';
 
 interface Materia {
@@ -27,7 +27,7 @@ interface Evaluacion {
   imports: [CommonModule, NavMenuComponent]
 })
 export class DashboardComponent implements OnInit {
-  currentUser: User | null = null;
+  usuarioActual: Usuario | null = null;
   materias: Materia[] = [
     { id: 1, nombre: 'Matemáticas Avanzadas', profesor: 'Dr. García', horario: 'Lunes y Miércoles 8:00-10:00', aula: 'A-101' },
     { id: 2, nombre: 'Física Cuántica', profesor: 'Dra. Rodríguez', horario: 'Martes y Jueves 10:00-12:00', aula: 'B-203' },
@@ -43,7 +43,7 @@ export class DashboardComponent implements OnInit {
   constructor(private authService: AuthService) {}
 
   ngOnInit() {
-    this.currentUser = this.authService.currentUserValue;
+    this.usuarioActual = this.authService.getUsuarioActual();
   }
 
   logout() {

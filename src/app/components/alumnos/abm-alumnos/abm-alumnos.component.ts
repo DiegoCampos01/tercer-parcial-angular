@@ -47,11 +47,18 @@ export class AbmAlumnosComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
+      this.alumnoId = Number(id);
       this.esEdicion = true;
-      this.alumnoId = +id;
       const alumno = this.alumnosService.getAlumnoById(this.alumnoId);
       if (alumno) {
-        this.alumnoForm.patchValue(alumno);
+        this.alumnoForm.patchValue({
+          nombre: alumno.nombre,
+          apellido: alumno.apellido,
+          email: alumno.email,
+          fechaNacimiento: alumno.fechaNacimiento
+        });
+      } else {
+        this.router.navigate(['/alumnos']);
       }
     }
   }

@@ -7,7 +7,6 @@ import { Alumno } from '../models/alumno.model';
 })
 export class AlumnosService {
   private readonly STORAGE_KEY = 'alumnos';
-  private alumnos: Alumno[] = [];
   private alumnosSubject = new BehaviorSubject<Alumno[]>([]);
 
   constructor() {
@@ -17,45 +16,43 @@ export class AlumnosService {
   private cargarAlumnos(): void {
     const alumnosGuardados = localStorage.getItem(this.STORAGE_KEY);
     if (alumnosGuardados) {
-      this.alumnos = JSON.parse(alumnosGuardados).map((alumno: any) => ({
+      const alumnos = JSON.parse(alumnosGuardados);
+      this.alumnosSubject.next(alumnos.map((alumno: any) => ({
         ...alumno,
         fechaNacimiento: new Date(alumno.fechaNacimiento)
-      }));
+      })));
     } else {
-      // Datos de ejemplo
-      this.alumnos = [
+      // Datos iniciales si no hay datos guardados
+      const alumnosIniciales: Alumno[] = [
         {
           id: 1,
           nombre: 'Juan',
           apellido: 'Pérez',
-          email: 'juan@email.com',
-          fechaNacimiento: new Date('1995-05-14'),
+          email: 'juan@example.com',
+          fechaNacimiento: new Date('1995-05-15'),
           cursos: []
         },
         {
           id: 2,
           nombre: 'María',
           apellido: 'González',
-          email: 'maria@email.com',
-          fechaNacimiento: new Date('2001-05-13'),
-          cursos: []
-        },
-        {
-          id: 3,
-          nombre: 'Spike',
-          apellido: 'Spiegel',
-          email: 'spike@email.com',
-          fechaNacimiento: new Date('1964-05-05'),
+          email: 'maria@example.com',
+          fechaNacimiento: new Date('1998-08-20'),
           cursos: []
         }
       ];
+      this.alumnosSubject.next(alumnosIniciales);
+      this.guardarAlumnos();
     }
-    this.alumnosSubject.next(this.alumnos);
   }
 
   private guardarAlumnos(): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.alumnos));
-    this.alumnosSubject.next(this.alumnos);
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.alumnosSubject.value));
+  }
+
+  private generarNuevoId(): number {
+    const alumnos = this.alumnosSubject.value;
+    return alumnos.length > 0 ? Math.max(...alumnos.map(a => a.id)) + 1 : 1;
   }
 
   getAlumnos(): Observable<Alumno[]> {
@@ -63,7 +60,7 @@ export class AlumnosService {
   }
 
   getAlumnoById(id: number): Alumno | undefined {
-    return this.alumnos.find(a => a.id === id);
+    return this.alumnosSubject.value.find(alumno => alumno.id === id);
   }
 
   agregarAlumno(alumno: Omit<Alumno, 'id' | 'cursos'>): void {
@@ -72,40 +69,50 @@ export class AlumnosService {
       id: this.generarNuevoId(),
       cursos: []
     };
-    this.alumnos.push(nuevoAlumno);
+    const alumnos = [...this.alumnosSubject.value, nuevoAlumno];
+    this.alumnosSubject.next(alumnos);
     this.guardarAlumnos();
   }
 
-  private generarNuevoId(): number {
-    return Math.max(...this.alumnos.map(a => a.id), 0) + 1;
-  }
-
   actualizarAlumno(alumno: Alumno): void {
-    const index = this.alumnos.findIndex(a => a.id === alumno.id);
-    if (index !== -1) {
-      this.alumnos[index] = alumno;
-      this.guardarAlumnos();
-    }
+    const alumnos = this.alumnosSubject.value.map(a => 
+      a.id === alumno.id ? alumno : a
+    );
+    this.alumnosSubject.next(alumnos);
+    this.guardarAlumnos();
   }
 
   eliminarAlumno(id: number): void {
-    this.alumnos = this.alumnos.filter(a => a.id !== id);
+    const alumnos = this.alumnosSubject.value.filter(a => a.id !== id);
+    this.alumnosSubject.next(alumnos);
     this.guardarAlumnos();
   }
 
   inscribirEnCurso(alumnoId: number, cursoId: number): void {
-    const alumno = this.getAlumnoById(alumnoId);
-    if (alumno && !alumno.cursos.includes(cursoId)) {
-      alumno.cursos.push(cursoId);
-      this.guardarAlumnos();
-    }
+    const alumnos = this.alumnosSubject.value.map(alumno => {
+      if (alumno.id === alumnoId && !alumno.cursos.includes(cursoId)) {
+        return {
+          ...alumno,
+          cursos: [...alumno.cursos, cursoId]
+        };
+      }
+      return alumno;
+    });
+    this.alumnosSubject.next(alumnos);
+    this.guardarAlumnos();
   }
 
   desinscribirDeCurso(alumnoId: number, cursoId: number): void {
-    const alumno = this.getAlumnoById(alumnoId);
-    if (alumno) {
-      alumno.cursos = alumno.cursos.filter(id => id !== cursoId);
-      this.guardarAlumnos();
-    }
+    const alumnos = this.alumnosSubject.value.map(alumno => {
+      if (alumno.id === alumnoId) {
+        return {
+          ...alumno,
+          cursos: alumno.cursos.filter(id => id !== cursoId)
+        };
+      }
+      return alumno;
+    });
+    this.alumnosSubject.next(alumnos);
+    this.guardarAlumnos();
   }
 } 

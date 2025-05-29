@@ -9,7 +9,13 @@ import { InscripcionesService } from '../../../services/inscripciones.service';
 import { AlumnosService } from '../../../services/alumnos.service';
 import { Curso } from '../../../models/curso.model';
 import { Alumno } from '../../../models/alumno.model';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+
+interface CursoConEstado extends Curso {
+  inscrito: boolean;
+  cuposDisponibles: number;
+}
 
 @Component({
   selector: 'app-lista-inscripciones',
@@ -26,7 +32,7 @@ import { Subscription } from 'rxjs';
 })
 export class ListaInscripcionesComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['nombre', 'profesor', 'duracion', 'cuposDisponibles', 'acciones'];
-  cursosDisponibles: any[] = [];
+  cursosDisponibles: CursoConEstado[] = [];
   alumnoId: number | null = null;
   alumno: Alumno | null = null;
   private subscriptions: Subscription[] = [];
@@ -69,27 +75,49 @@ export class ListaInscripcionesComponent implements OnInit, OnDestroy {
   }
 
   cargarCursosDisponibles(): void {
-    this.cursosService.getCursos().subscribe(cursos => {
-      this.cursosDisponibles = cursos.map(curso => ({
-        ...curso,
-        inscrito: this.alumnoId ? this.inscripcionesService.estaInscrito(curso.id, this.alumnoId) : false,
-        cuposDisponibles: curso.cupo - (curso.alumnos?.length || 0)
-      }));
-    });
+    this.subscriptions.push(
+      this.cursosService.getCursos().pipe(
+        switchMap(cursos => {
+          if (!this.alumnoId) {
+            // Si no hay alumno seleccionado, mostrar todos los cursos con sus cupos
+            return of(cursos.map(curso => ({
+              ...curso,
+              inscrito: false,
+              cuposDisponibles: curso.cupo - (curso.alumnos?.length || 0)
+            })));
+          }
+          // Si hay alumno seleccionado, verificar inscripciones
+          return forkJoin(
+            cursos.map(curso =>
+              this.inscripcionesService.estaInscrito(curso.id, this.alumnoId!).pipe(
+                map(inscrito => ({
+                  ...curso,
+                  inscrito,
+                  cuposDisponibles: curso.cupo - (curso.alumnos?.length || 0)
+                }))
+              )
+            )
+          );
+        })
+      ).subscribe(cursosConEstado => {
+        this.cursosDisponibles = cursosConEstado;
+      })
+    );
   }
 
-  inscribirse(curso: any): void {
+  inscribirse(curso: CursoConEstado): void {
     if (this.alumnoId && curso.cuposDisponibles > 0 && !curso.inscrito) {
-      this.inscripcionesService.inscribirAlumno(curso.id, this.alumnoId);
-      this.cargarCursosDisponibles();
-      this.router.navigate(['/notas/lista']);
+      this.inscripcionesService.inscribirAlumno(curso.id, this.alumnoId).subscribe(() => {
+        this.cargarCursosDisponibles();
+      });
     }
   }
 
-  desinscribirse(curso: any): void {
+  desinscribirse(curso: CursoConEstado): void {
     if (this.alumnoId && curso.inscrito) {
-      this.inscripcionesService.desinscribirAlumno(curso.id, this.alumnoId);
-      this.cargarCursosDisponibles();
+      this.inscripcionesService.desinscribirAlumno(curso.id, this.alumnoId).subscribe(() => {
+        this.cargarCursosDisponibles();
+      });
     }
   }
 
